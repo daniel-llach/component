@@ -15,7 +15,7 @@ define([
     });
 
     var Target = new ExampleLayout();
-    Target.addRegion("example", "#example");
+    Target.addRegion("main", "#example");
     Target.render();
 
     // Data
@@ -23,6 +23,7 @@ define([
         {
             id: "component1",
             region: "main",
+            channel: "c1",
             title: "El título",
             controls: [
                 {
@@ -31,7 +32,6 @@ define([
                     icon: "filter",
                 }
             ],
-            interacts: ["self", "column"], // regions
             content: [
                 {
                     name: "table"
@@ -45,54 +45,46 @@ define([
 
         // modelo
         Component.ComponentModel = Backbone.Model.extend({
-            defaults: {
-                id: "component1",
-                region: "main",
-                title: "El título",
-                controls: [
-                    {
-                        align: "right",
-                        name: "sorting",
-                        icon: "filter",
-                    }
-                ],
-                interacts: ["self", "column"], // regions
-                content: [
-                    {
-                        name: "table"
-                    }
-                ]
-            }
+            defaults: {}
         });
 
-        // Component layout
-        Component.ComponentLayoutView = Marionette.LayoutView.extend({
+        Component.ComponentCollection = Backbone.Collection.extend({
+            model: Component.ComponentModel
+        });
+
+        Component.ComponentItemView = Marionette.ItemView.extend({
             tagName: "div",
             className: "component",
             template: _.template(ComponentTemplate),
-
             regions: {
+                title: ".title",
                 controls: ".controls",
                 content: ".content"
             },
-
             onRender: function(){
-                console.log("component: render");
+                console.log('Component.ComponentLayoutView: onRender');
 
-                var dataModel = new Component.ComponentModel(dataComponent);
-                // this.component.show(dataModel);
-                console.log("dataModel: ", dataModel);
+                var title = this.model.get('title');
+                console.log("title: ", title);
             }
-
         });
 
         Component.addInitializer(function(){
-            /* crea nueva instancia del layout desde el modulo */
-            var componentLayout = new Component.ComponentLayoutView();
+            // create models with collections
+            var components= new Component.ComponentCollection(dataComponent);
 
-            /* muestra el layout en la region definida */
-            Target.example.show(componentLayout);
+            components.each(function(component){
+                var region = component.get("region");
+
+                // create
+                var contentView = new Component.ComponentItemView({model:component});
+                console.log("contentView: ", contentView);
+
+                Target[region].show(contentView);
+            });
+
         });
+
     }, dataComponent);
 
 
