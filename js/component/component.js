@@ -1,9 +1,8 @@
 define([
     "backbone.marionette",
     "backbone.radio",
-    "radio.shim",
-    "text!component/templates/componentTemplate.html"
-], function (Marionette, Radio, Shim, ComponentTemplate) {
+    "radio.shim"
+], function (Marionette, Radio, Shim) {
 
     // Enviroment
     var App = new Marionette.Application();
@@ -55,7 +54,7 @@ define([
         Component.ComponentItemView = Marionette.ItemView.extend({
             tagName: "div",
             className: "component",
-            template: _.template(ComponentTemplate),
+            template: _.template('<div class="header"><h1><%- title %></h1></div><div class="controls"></div><div class="content"></div>'),
             regions: {
                 title: ".title",
                 controls: ".controls",
